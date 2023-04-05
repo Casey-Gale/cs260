@@ -1,6 +1,8 @@
 #include "helper_functions.h"
 #include <iostream>
 
+using namespace std;
+
 int main() {
     srand(time(NULL));
     Node* head = nullptr;
@@ -21,7 +23,7 @@ int main() {
             draw_marble(head, length);
         }
         else if(choice == 3) {
-            count_marbles(head, length);
+            count_marbles(length);
         }
         else {
             break;

@@ -3,14 +3,15 @@
 
 class Node
 {
-private:
-    marble m;
-    Node* next;
 public:
+    Marble m;
+    Node* next;
     Node();
 };
 
 Node::Node() {
-    this->m = 0;
+    this->m.set_color("N/A");
     this->next = nullptr;
 }
+
+#endif

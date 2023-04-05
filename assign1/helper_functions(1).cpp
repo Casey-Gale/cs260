@@ -1,4 +1,5 @@
 #include "helper_functions.h"
+#include <iostream>
 
 using namespace std;
 
@@ -7,7 +8,7 @@ void add_marble(Node* head, int& length) {
 
     if(head == nullptr) {
         head = new Node;
-        head->m = get_marble();
+        head->m = *(get_marble());
         length++;
         return;
     }
@@ -16,7 +17,7 @@ void add_marble(Node* head, int& length) {
         current = current->next;
     }
     current = new Node;
-    current->m = get_marble();
+    current->m = *(get_marble());
     length++;
 
 }

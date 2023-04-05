@@ -5,12 +5,12 @@
 
 class Marble {
     private:
-        string color;
+        std::string color;
     public: 
         Marble();
-        Marble(string);
-        string get_color();
-        void set_color(string);
+        Marble(std::string);
+        std::string get_color();
+        void set_color(std::string);
         void print();
 };
 

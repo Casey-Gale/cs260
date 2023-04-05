@@ -1,13 +1,14 @@
 #include "marble.h"
+#include <iostream>
 
 Marble::Marble() {
     this->color = "N/A";
 }
-Marble::Marble(string color) {
+Marble::Marble(std::string color) {
     this->color = color;
 }
-Marble::get_color() {return this->color;}
-Marble::set_color(string color) {this->color = color;}
-Marble::print() {
-    cout << this->color << endl;
+std::string Marble::get_color() {return this->color;}
+void Marble::set_color(std::string color) {this->color = color;}
+void Marble::print() {
+    std::cout << this->color << std::endl;
 }
