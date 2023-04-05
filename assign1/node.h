@@ -1,6 +1,8 @@
 #ifndef NODE
 #define NODE
 
+#include "marble.h"
+
 class Node
 {
 public:
