@@ -1,0 +1,2 @@
+this program will use classes to represent the marbles themselves.
+because the number of marbles will be highly variable, i will use a linked list to represent all of the marbles inside the bag. this will allow me to add and remove marbles quickly and without issue.
