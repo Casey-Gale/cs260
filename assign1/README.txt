@@ -15,3 +15,9 @@ if the user chooses to do manual testing:
   if the user chooses to count marbles:
     the program will sum up all marbles and print out the total number.
   it should be difficult to break the program via unexpected user inputs, but who knows.
+
+  line numbers:
+  (field 3.1) implementation of adding marbles is in lines 40-62
+  (field 3.2) implementation of drawing marbles is in lines 66-84
+  (field 3.3) implementation of counting marbles is in lines 88-90
+  (field 4) testing begins at line 135
