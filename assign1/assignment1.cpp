@@ -11,9 +11,9 @@ void do_default_test(int& r, int& g, int& b);
 
 int main() {
     srand(time(NULL));
-    int r = 0;
-    int g = 0;
-    int b = 0;
+    int r = 0; //integer representing the number of red marbles contained in the bag
+    int g = 0; //integer representing the number of green marbles contained in the bag
+    int b = 0; //integer representing the number of blue marbles contained in the bag
 
     cout << "Do you want to run through hard-coded tests or manually test?" << endl;
     cout << "1-Default tests" << endl;
@@ -28,6 +28,8 @@ int main() {
     }
     else {
         do_free_test(r, g, b);
+
+        cout << "Ending program..." << endl << endl;
     }
 
     return 0;
@@ -119,7 +121,7 @@ void do_free_test(int& r, int& g, int& b) {
                     cout << "There are " << count_marbles(r, g, b) << " marbles in the bag!" << endl;
                     break;
                 default:
-                    return 0;
+                    return;
             }
         }
         else {
@@ -131,19 +133,20 @@ void do_free_test(int& r, int& g, int& b) {
 
 //hard-coded test cases for the program
 void do_default_test(int& r, int& g, int& b) {
+    cout << endl;
 //tests if count_marbles works on 0
-    cout << "TEST 1: count_marbles()" << endl;
+    cout << "TEST 1: count_marbles() -- TESTING WITH EMPTY BAG" << endl;
     cout << "EXPECTED: 0" << endl;
     cout << "ACTUAL  : " << count_marbles(r, g, b) << endl << endl;
 
 //tests if r is drawn if it is the only marble in there
     r = 1;
-    cout << "TEST 2.1.1: count_marbles()" << endl;
+    cout << "TEST 2.1.1: count_marbles() -- TESTING WITH ONLY RED IN BAG" << endl;
     cout << "EXPECTED: 1" << endl;
     cout << "ACTUAL  : " << count_marbles(r, g, b) << endl << endl;
 
     cout << "TEST 2.1.2: draw_marble()" << endl;
-    cout << "EXPECTED: r" << endl;
+    cout << "EXPECTED: red" << endl;
     cout << "ACTUAL  : " << draw_marble(r, g, b) << endl << endl;
 
     cout << "TEST 2.1.3: count_marbles()" << endl;
@@ -152,12 +155,12 @@ void do_default_test(int& r, int& g, int& b) {
 
 //tests if g is drawn if it is the only marble in there
     g = 1;
-    cout << "TEST 2.2.1: count_marbles()" << endl;
+    cout << "TEST 2.2.1: count_marbles() -- TESTING WITH ONLY GREEN IN BAG" << endl;
     cout << "EXPECTED: 1" << endl;
     cout << "ACTUAL  : " << count_marbles(r, g, b) << endl << endl;
 
     cout << "TEST 2.2.2: draw_marble()" << endl;
-    cout << "EXPECTED: g" << endl;
+    cout << "EXPECTED: green" << endl;
     cout << "ACTUAL  : " << draw_marble(r, g, b) << endl << endl;
 
     cout << "TEST 2.2.3: count_marbles()" << endl;
@@ -166,12 +169,12 @@ void do_default_test(int& r, int& g, int& b) {
 
 //tests if b is drawn if it is the only marble in there
     b = 1;
-    cout << "TEST 2.3.1: count_marbles()" << endl;
+    cout << "TEST 2.3.1: count_marbles() -- TESTING WITH ONLY BLUE IN BAG" << endl;
     cout << "EXPECTED: 1" << endl;
     cout << "ACTUAL  : " << count_marbles(r, g, b) << endl << endl;
 
     cout << "TEST 2.3.2: draw_marble()" << endl;
-    cout << "EXPECTED: b" << endl;
+    cout << "EXPECTED: blue" << endl;
     cout << "ACTUAL  : " << draw_marble(r, g, b) << endl << endl;
 
     cout << "TEST 2.3.3: count_marbles()" << endl;
@@ -179,7 +182,7 @@ void do_default_test(int& r, int& g, int& b) {
     cout << "ACTUAL  : " << count_marbles(r, g, b) << endl << endl;
 
 //tests if draw_marble works with 0 marbles
-    cout << "TEST 3.1: draw_marble()" << endl;
+    cout << "TEST 3.1: draw_marble() -- TESTING WITH EMPTY BAG" << endl;
     cout << "EXPECTED: There aren't any marbles in the bag!" << endl;
     cout << "ACTUAL  : " << draw_marble(r, g, b) << endl << endl;
 
@@ -187,12 +190,12 @@ void do_default_test(int& r, int& g, int& b) {
     r = 2147483647;
     g = 0;
     b = 0;
-    cout << "TEST 3.2.1: count_marbles()" << endl;
+    cout << "TEST 3.2.1: count_marbles() -- TESTING NEAR OVERFLOW" << endl;
     cout << "EXPECTED: 2147483647" << endl;
     cout << "ACTUAL  : " << count_marbles(r, g, b) << endl << endl;
 
     cout << "TEST 3.2.2: draw_marble()" << endl;
-    cout << "EXPECTED: r" << endl;
+    cout << "EXPECTED: red" << endl;
     cout << "ACTUAL  : " << draw_marble(r, g, b) << endl << endl;
 
     cout << "TEST 3.2.3: count_marbles()" << endl;
@@ -203,12 +206,12 @@ void do_default_test(int& r, int& g, int& b) {
     r = 0;
     g = 2147483648;
     b = 0;
-    cout << "TEST 3.2.1: count_marbles()" << endl;
+    cout << "TEST 3.2.1: count_marbles() -- TESTING PAST OVERFLOW" << endl;
     cout << "EXPECTED: 2147483648" << endl;
     cout << "ACTUAL  : " << count_marbles(r, g, b) << endl << endl;
 
     cout << "TEST 3.2.2: draw_marble()" << endl;
-    cout << "EXPECTED: g" << endl;
+    cout << "EXPECTED: green" << endl;
     cout << "ACTUAL  : " << draw_marble(r, g, b) << endl << endl;
 
     cout << "TEST 3.2.3: count_marbles()" << endl;
