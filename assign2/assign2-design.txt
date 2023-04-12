@@ -1,0 +1,24 @@
+designing a queue data structure:
+
+2. 
+	a. for a queue, we will need a function for enqueuing 
+	   information and dequeueing information. 
+	b. we should keep track of the location of the head of
+	   the queue, along with the location of the tail. every
+	   time that the queue is lengthened or shortened, the 
+	   head or tail should be updated accordingly.
+
+3. 
+	a. in order for us to insert in the middle of the queue, 
+	   we will need a function that will iterate through the 
+	   list until the desired location, modify that node's next 
+	   pointer to point at a new node, then have the new node 
+	   point at the beginning of the rest of the list. 
+	   essentially, it splits it into two new queues and then 
+	   concatenates them after inserting a new element.
+	b. we need to know the beginning of the queue so that we 
+	   have a starting place to iterate. additionally, we will
+	   need to have the total length of the queue so that we
+	   know whether or not the desired location is even contained
+	   inside the queue. without knowing the length, the odds that
+	   this function will segfault increase astronomically.
