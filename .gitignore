@@ -1,3 +1,4 @@
 
-assign4/assignment4.exe
+*.o
 *.exe
+*.out
