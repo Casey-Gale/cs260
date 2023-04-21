@@ -95,7 +95,7 @@ void List::push(const int val, const int i) {
         this->length++;
     }
     //if i is out of bounds
-    else if(i < 0 || i >= this->length) {
+    else if(i < 0 || i > this->length) {
         cout << "OUT OF BOUNDS" << endl;
         return;
     }
