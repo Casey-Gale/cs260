@@ -59,3 +59,8 @@ Testing for this program is included in one function (do testing()) that calls t
 test_queue_with_int() and test_queue_with_string(). Both of these functions run through tests 
 with an integer and string queue respectively, attempting to enqueue, dequeue, peek, and 
 print on a queue with 0 and >0 pre-existing entries.
+
+Queue (linked list) class declaration: line 33
+Enqueue function definition: line 63
+Dequeue function definition: line 79
+Peek function definition: line 99
