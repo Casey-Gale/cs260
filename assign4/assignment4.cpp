@@ -48,9 +48,12 @@ class List {
         void push_front(const int val); //pushes to the front of the list
         int pop_back(); //pops from the back of the list
         int pop_front(); //pops from the front of the list
+        int peek_back();
+        int peek_front();
 
         void push(const int val, const int i); //pushes to index i of list
         int pop(const int i); //pops from index i of list
+        int peek(const int i);
         
         void print() const;
 };
@@ -228,6 +231,41 @@ int List::pop(int i) {
         delete current;
         this->length--;
         return val;
+    }
+}
+// O(1)
+int List::peek_front() {
+    return this->head->get_val();
+}
+// O(1)
+int List::peek_back() {
+    return this->tail->get_val();
+}
+// O(n)
+//throws 1 if out of bounds, throws 2 if empty list
+int List::peek(const int i) {
+    if(this->length == 0) {
+        throw 2;
+    }
+    //check if the index is in bounds
+    else if(i < 0 || i >= this->length) {
+        throw 1;
+    }
+    //check if index is 0
+    else if(i == 0) {
+        return peek_front();
+    }
+    //check if index is equal to length
+    else if(i == this->length - 1) {
+        return peek_back();
+    }
+    //else
+    else {
+        Node* current = this->head;
+        for(int j = 0; j < i; j++) {
+            current = current->get_next();
+        }
+        return current->get_val();
     }
 }
 
@@ -436,11 +474,61 @@ void test_pop(List* l) {
     l->print();
 }
 
-// tests the arbitrary push() and pop() functions in the list
+// tests the peek function
+void test_peek() {
+    List l;
+    for(int i = 0; i < 10; i++) {
+        l.push_front(i);
+    }
+    cout << "Peeking at every single value one by one: " << endl;
+    cout << "Expected: 9 8 7 6 5 4 3 2 1 0" << endl;
+    cout << "Actual:   ";
+    for(int i = 0; i < 10; i++) {
+        cout << l.peek(i) << " ";
+    }
+    cout << endl;
+
+    cout << "Peeking outside of bounds" << endl;
+    cout << "Expected: OUT OF BOUNDS" << endl;
+    cout << "Actual:   ";
+    try {
+        cout << l.peek(100) << endl;
+    }
+    catch(int n) {
+        if(n == 1) {
+            cout << "OUT OF BOUNDS" << endl;
+        }
+        else if(n == 2) {
+            cout << "EMPTY LIST" << endl;
+        }
+    }
+
+    List l2;
+    cout << "Peeking at an empty list" << endl;
+    cout << "Expected: EMPTY LIST" << endl;
+    cout << "Actual:   ";
+    try {
+        cout << l2.peek(1) << endl;
+    }
+    catch(int n) {
+        if(n == 1) {
+            cout << "OUT OF BOUNDS" << endl;
+        }
+        else if(n == 2) {
+            cout << "EMPTY LIST" << endl;
+        }
+    }
+    cout << endl;
+}
+
+// tests the arbitrary push() and pop() and peek() functions in the list
 void test_all() {
     List* l_ptr;
     l_ptr = test_push();
+    cout << endl;
     test_pop(l_ptr);
+    cout << endl;
+    test_peek();
     cout << endl;
 }
 
