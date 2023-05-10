@@ -4,17 +4,18 @@
 using std::cout;
 using std::endl;
 
+//auto sorted list
+//should automatically decide where to place objects based on the value stored in the object
+//will likely have most operations be O(n)
+
 class Node {
     private:
+        
+    public:
         int val;
         Node* next;
-    public:
         Node();
         Node(int);
-        int get_val() const;
-        void set_val(const int);
-        Node* get_next();
-        void set_next(Node*);
 };
 
 Node::Node() {
@@ -25,89 +26,265 @@ Node::Node(int val) {
     this->val = val;
     this->next = nullptr;
 }
-int Node::get_val() const {return this->val;}
-void Node::set_val(const int val) {this->val = val;}
-Node* Node::get_next() {return this->next;}
-void Node::set_next(Node* next) {this->next = next;}
 
 
-class Queue {
+class List {
     private: 
         Node* head;
-        Node* tail;
         int length;
     public:
-        Queue();
-        ~Queue();
+        List();
         int get_length() const;
-
-        void enqueue(const int val); //pushes to the back of the queue
-        int dequeue(); //pops from the front of the queue
+        void push(const int val); //pushes to the back of the List
+        int search(const int index);
         
         void print() const;
 };
-Queue::Queue() {
+List::List() {
     this->head = nullptr;
-    this->tail = nullptr;
     this->length = 0;
 }
-Queue::~Queue() {
-    int n = this->length; //exists so that it doesnt get modified during the for loop
-    for (int i = 0; i < n; i++) {
-        this->dequeue();
-    }
-}
-int Queue::get_length() const {return this->length;}
+int List::get_length() const {return this->length;}
 
-//pushes in a value to the back of the queue.
-void Queue::enqueue(const int val) {
-    //if length == 0
+//automatically pushes a value to a sorted list in a sorted position
+void List::push(const int new_val) {
+    //cout << "Pushing " << new_val << endl;
+    //if list is empty
+    Node* current = this->head;
     if(this->length == 0) {
-        this->head = new Node(val);
-        this->tail = this->head;
+        //cout << "length == 0" << endl;
+        this->head = new Node(new_val); // new node->next is automatically nullptr
+    }
+    // checks if the value is less than the first 
+    else if(new_val < this->head->val) {
+        //cout << "current == head" << endl;
+        current = new Node(new_val);
+        current->next = this->head;
+        this->head = current;
     }
     //else
     else {
-        this->tail->set_next(new Node(val));
-        this->tail = this->tail->get_next();
+        while(current->next != nullptr && new_val > current->next->val) {
+            current = current->next;
+        }
+    
+        // checks if current is at the end of the list
+        if(current->next == nullptr) {
+            //cout << "current->next == nullptr" << endl;
+            current->next = new Node(new_val);
+        }
+        // now, we may assume that current is pointing to an object in the middle of the list
+        else {
+            //cout << "current is in the middle" << endl;
+            Node* after = current->next;
+            current->next = new Node(new_val);
+            current->next->next = after;
+        }
     }
     this->length++;
 }
 
-//pops out the front value in the queue. 
-int Queue::dequeue() {
-    //if length == 0
+// searches for the value stored at specified index
+// throws 1 if OUT OF BOUNDS and throws 2 if EMPTY LIST
+int List::search(const int index) {
+    Node* current = this->head;
     if(this->length == 0) {
+        throw 2;
+    }
+    if(index < 0 || index >= this->length) {
         throw 1;
     }
-    Node temp = *(this->head);
-    delete this->head;
-    if(this->length == 1) {
-        this->head = nullptr;
-        this->tail = nullptr;
+    for(int i = 0; i < index; i++) {
+        current = current->next;
     }
-    else {
-        this->head = temp.get_next();
-    }
-    this->length--;
-    return temp.get_val();
+    return current->val;
 }
 
-//prints out the entire queue from the front to the back. assumes a valid value for length
-void Queue::print() const {
+
+//prints out the entire List from the front to the back. assumes a valid value for length
+void List::print() const {
     Node* current = this->head;
     for(int i = 0; i < this->length; i++) {
-        cout << current->get_val() << " ";
-        current = current->get_next();
+        cout << current->val << " ";
+        current = current->next;
     }
-    if(this->length == 0) {
-        cout << "The queue is empty" << endl;
+    cout << endl << endl;
+}
+
+void do_testing() {
+    List l;
+
+    // testing insert
+    cout << "TESTING INSERTING A VALUE INTO AN EMPTY LIST" << endl;
+    l.push(0);
+    cout << "Expected: 0" << endl;
+    cout << "Actual:   ";
+    l.print();
+
+    cout << "TESTING INSERTING A VALUE BEHIND THE ONLY ELEMENT IN A LIST" << endl;
+    l.push(1);
+    cout << "Expected: 0 1" << endl;
+    cout << "Actual:   ";
+    l.print();
+
+    cout << "TESTING INSERTING THE SAME VALUE AS THE LAST ELEMENT IN A LIST" << endl;
+    l.push(1);
+    cout << "Expected: 0 1 1" << endl;
+    cout << "Actual:   ";
+    l.print();
+
+    cout << "TESTING INSERTING THE SAME VALUE AS THE FIRST ELEMENT IN A LIST" << endl;
+    l.push(0);
+    cout << "Expected: 0 0 1 1 " << endl;
+    cout << "Actual:   ";
+    l.print();
+
+    cout << "TESTING INSERTING A VALUE TO THE END OF AN EXISTING LIST" << endl;
+    l.push(3);
+    cout << "Expected: 0 0 1 1 3" << endl;
+    cout << "Actual:   ";
+    l.print();
+
+    cout << "TESTING INSERTING A VALUE TO THE BEGINNING OF AN EXISTING LIST" << endl;
+    l.push(-2);
+    cout << "Expected: -2 0 0 1 1 3" << endl;
+    cout << "Actual:   ";
+    l.print();
+
+    cout << "TESTING INSERTING A VALUE AFTER THE BEGINNING OF AN EXISTING LIST" << endl;
+    l.push(-1);
+    cout << "Expected: -2 -1 0 0 1 1 3" << endl;
+    cout << "Actual:   ";
+    l.print();
+
+    cout << "TESTING INSERTING A VALUE BEFORE THE END OF AN EXISTING LIST" << endl;
+    l.push(2);
+    cout << "Expected: -2 -1 0 0 1 1 2 3" << endl;
+    cout << "Actual:   ";
+    l.print();
+
+    cout << "TESTING INSERTING A VALUE IN THE MIDDLE OF AN EXISTING LIST" << endl;
+    l.push(0);
+    cout << "Expected: -2 -1 0 0 0 1 1 2 3" << endl;
+    cout << "Actual:   ";
+    l.print();
+
+    List l2;
+    // testing search
+    cout << "TESTING SEARCHING FOR A VALUE IN AN EMPTY LIST" << endl;
+    cout << "Expected: EMPTY LIST" << endl;
+    cout << "Actual:   ";
+    try {
+        cout << l2.search(0) << endl;
     }
-    cout << endl;
+    catch(int n) {
+        if(n == 1) {
+            cout << "OUT OF BOUNDS" << endl;
+        }
+        else if(n == 2) {
+            cout << "EMPTY LIST" << endl;
+        }
+    }
+
+    l2.push(1);
+    cout << "TESTING SEARCHING FOR A VALUE IN A LIST WITH 1 ELEMENT" << endl;
+    cout << "Expected: 1" << endl;
+    cout << "Actual:   ";
+    try {
+        cout << l2.search(0) << endl;
+    }
+    catch(int n) {
+        if(n == 1) {
+            cout << "OUT OF BOUNDS" << endl;
+        }
+        else if(n == 2) {
+            cout << "EMPTY LIST" << endl;
+        }
+    }
+
+    cout << "TESTING SEARCHING FOR A VALUE AT INDEX -1" << endl;
+    cout << "Expected: OUT OF BOUNDS" << endl;
+    cout << "Actual:   ";
+    try {
+        cout << l2.search(-1) << endl;
+    }
+    catch(int n) {
+        if(n == 1) {
+            cout << "OUT OF BOUNDS" << endl;
+        }
+        else if(n == 2) {
+            cout << "EMPTY LIST" << endl;
+        }
+    }
+
+    cout << "TESTING SEARCHING FOR A VALUE AT INDEX 1 (OUT OF BOUNDS)" << endl;
+    cout << "Expected: OUT OF BOUNDS" << endl;
+    cout << "Actual:   ";
+    try {
+        cout << l2.search(1) << endl;
+    }
+    catch(int n) {
+        if(n == 1) {
+            cout << "OUT OF BOUNDS" << endl;
+        }
+        else if(n == 2) {
+            cout << "EMPTY LIST" << endl;
+        }
+    }
+
+    l2.push(-1);
+    l2.push(2);
+    l2.push(3);
+    l2.push(4);
+    cout << "TESTING SEARCHING FOR A VALUE AT END OF POPULATED LIST" << endl;
+    cout << "Expected: 4" << endl;
+    cout << "Actual:   ";
+    try {
+        cout << l2.search(4) << endl;
+    }
+    catch(int n) {
+        if(n == 1) {
+            cout << "OUT OF BOUNDS" << endl;
+        }
+        else if(n == 2) {
+            cout << "EMPTY LIST" << endl;
+        }
+    }
+
+    cout << "TESTING SEARCHING FOR A VALUE AT BEGINNING OF POPULATED LIST" << endl;
+    cout << "Expected: -1" << endl;
+    cout << "Actual:   ";
+    try {
+        cout << l2.search(0) << endl;
+    }
+    catch(int n) {
+        if(n == 1) {
+            cout << "OUT OF BOUNDS" << endl;
+        }
+        else if(n == 2) {
+            cout << "EMPTY LIST" << endl;
+        }
+    }
+
+    cout << "TESTING SEARCHING FOR A VALUE AT THE MIDDLE OF A POPULATED LIST" << endl;
+    cout << "Expected: 2" << endl;
+    cout << "Actual:   ";
+    try {
+        cout << l2.search(2) << endl;
+    }
+    catch(int n) {
+        if(n == 1) {
+            cout << "OUT OF BOUNDS" << endl;
+        }
+        else if(n == 2) {
+            cout << "EMPTY LIST" << endl;
+        }
+    }
 }
 
 
 int main() {
+    do_testing();
 
     return 0;
 }
