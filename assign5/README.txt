@@ -14,3 +14,8 @@ void print() : O(n)
     This function prints out all elements of the list. It loops through every elements
     and prints it to the terminal, separating each element with a single space character " "
 
+Line Numbers:
+
+push() : Line 50
+search() : Line 89
+print() : Line 105
