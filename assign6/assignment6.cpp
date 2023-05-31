@@ -53,9 +53,10 @@ BST::BST() {
     root = nullptr;
 }
 BST::~BST() {
-    cout << "bst destructor" << endl;
+    // cout << "bst destructor" << endl;
 }
 
+// function adds a node with val = 'new_val' to the BST 
 void BST::add(int new_val) {
     Node* current = root;
     if(current == nullptr) {
@@ -88,10 +89,6 @@ void BST::add(int new_val) {
 
 // function adds a ptr to an existing node to the BST
 void BST::add(Node* new_ptr) {
-    // cout << endl << "attempting to add existing node to the tree..." << endl;
-    // cout << "node details: " << endl;
-    // new_ptr->print_info();
-    // cout << endl;
     if(new_ptr == nullptr) {
         return;
     }
@@ -104,16 +101,7 @@ void BST::add(Node* new_ptr) {
     // while loop takes current to the parent of where we want to insert
     while(true) {
 
-        // cout << "new_ptr address == " << new_ptr << endl;
-        // // cout << "new_ptr->val == " << new_ptr->val << endl;
-        // cout << "current->val == " << current->val << endl;
-        // cout << endl;
-
-        // current->print_info();
-        // cout << endl;
-        // cout << "we did not get this far" << endl;
         if(new_ptr->val <= current->val) {
-            // cout << "moving to the left... (line 107)" << endl;
             if(current->left != nullptr) {
                 current = current->left;
             }
@@ -123,7 +111,6 @@ void BST::add(Node* new_ptr) {
             }
         }
         else {
-            // cout << "moving to the right... (line 117)" << endl;
             if(current->right != nullptr) {
                 current = current->right;
             }
@@ -133,13 +120,16 @@ void BST::add(Node* new_ptr) {
             }
         }
     }
-
-    // print_in_order();
 }
 
 // should walk through in-order traversal 'index' times to arrive at desired node
 // returns integer '0' if successfully removed object, returns '1' if object not found
 int BST::remove(int old_val) {
+
+    if(root == nullptr) {
+        return 1;
+    }
+
     Node* current = root;
     Node* previous;
 
@@ -147,26 +137,21 @@ int BST::remove(int old_val) {
     // this happens by looping until current->val == old_val
     // if current->left < old_val and current->right > old_val, but current->val != old_val, return an integer for error
     while(current->val != old_val) {
-        // cout << "wuh oh" << endl;
         previous = current;
         if(current->val > old_val) {
             if(current->left != nullptr) {
-                // cout << "moving to the left (line 133)" << endl;
                 current = current->left;
             }
             else {
-                // cout << "value not found (current->left == nullptr) (line 137)" << endl;
                 // in this scenario, current->val > old_val. however, current->left is nullptr. this means that the value we're looking for cant be found
                 return 1;
             }
         }
         else {
             if(current->right != nullptr) {
-                // cout << "moving to the right (line 144)" << endl;
                 current = current->right;
             }
             else {
-                // cout << "value not found (current->right == nullptr) (line 148)" << endl;
                 // in this scenario, current->val <= old_val. however, current->right is nullptr. this means that the value we're looking for cant be found
                 return 1;
             }
@@ -175,7 +160,6 @@ int BST::remove(int old_val) {
 
     // if removing root node
     if(current == nullptr) {
-        // cout << "the tree is empty" << endl;
         // the tree is empty, so there is nothing to be removed from it
         return 1;
     }
@@ -184,10 +168,6 @@ int BST::remove(int old_val) {
     Node* p_right = current->right;
 
     if(current == root) {
-        // cout << "deleting the root..." << endl;
-        // cout << "node details: " << endl;
-        // current->print_info();
-        // cout << endl;
         delete current;
         root = p_left;
         add(p_right);
@@ -195,18 +175,11 @@ int BST::remove(int old_val) {
 
     // if not removing root node
     else {
-        // cout << endl << "deleting an intermediate node..." << endl;
-        // cout << "node details: " << endl;
-        // current->print_info();
-        // cout << endl;
-
         // this if/else tries to sever the connection between the previous node and the node we are deleting
         if(previous->left == current) {
-            // cout << "severing the left of node with val = " << previous->val << endl;
             previous->left = nullptr;
         }
         else {
-            // cout << "severing the right of node with val = " << previous->val << endl;
             previous->right = nullptr;
         }
         delete current;
@@ -216,28 +189,6 @@ int BST::remove(int old_val) {
 
     return 0;
 }
-
-// Node* BST::find_highest_descendant(Node* current, Node* maximum) {
-//     // always compare current node to maximum, then return the greater of the two
-//     if(current != nullptr) {
-//         Node* temp_right = find_highest_descendant(current->right);
-//     }
-// }
-
-// Node* BST::move_in_order(Node* current, int& index) {
-//     if(index > 0) {
-//         if(current != nullptr) {
-//             move_in_order(current->left, index);
-//             index--;
-//             move_in_order(current->right, index);
-//         }
-//     }
-//     else {
-//         return current;
-//     }
-// }
-
-
 
 void BST::print_in_order() {
     in_order_traversal(root);
@@ -252,32 +203,102 @@ void BST::in_order_traversal(Node* current) {
     }
 }
 
+void do_testing() {
+    BST t;
+
+    t.add(10);
+    cout << "TESTING ADD TO AN EMPTY TREE" << endl;
+    cout << "EXPECTED: 10" << endl;
+    cout << "ACTUAL:   ";
+    t.print_in_order();
+
+    t.add(15);
+    cout << "TESTING ADD TO THE RIGHT OF THE ROOT NODE" << endl;
+    cout << "EXPECTED: 10 15" << endl;
+    cout << "ACTUAL:   ";
+    t.print_in_order();
+
+    t.add(5);
+    cout << "TESTING ADD TO THE LEFT OF THE ROOT NODE" << endl;
+    cout << "EXPECTED: 5 10 15" << endl;
+    cout << "ACTUAL:   ";
+    t.print_in_order();
+
+    t.add(9);
+    cout << "TESTING ADD TO A BALANCED TREE" << endl;
+    cout << "EXPECTED: 5 9 10 15" << endl;
+    cout << "ACTUAL:   ";
+    t.print_in_order();
+
+    t.add(14);
+    cout << "TESTING ADD TO A BALANCED TREE" << endl;
+    cout << "EXPECTED: 5 9 10 14 15" << endl;
+    cout << "ACTUAL:   ";
+    t.print_in_order();
+
+    for(int i = 0; i < 10; i++) {
+        t.add(i);
+    }
+    cout << "TESTING ADDING VALUES 0 THROUGH 9 TO AN EXISTING TREE" << endl;
+    cout << "EXPECTED: 0 1 2 3 4 5 5 6 7 8 9 9 10 14 15" << endl;
+    cout << "ACTUAL:   ";
+    t.print_in_order();
+
+
+    cout << endl << endl;
+
+    cout << "TESTING REMOVING THE VALUE 5 FROM A TREE CONTAINING MULTIPLE 5s" << endl;
+    cout << "EXPECTED RETURN VALUE: 0" << endl;
+    cout << "ACTUAL:                " << t.remove(5) << endl;
+    cout << "EXPECTED: 0 1 2 3 4 5 6 7 8 9 9 10 14 15" << endl;
+    cout << "ACTUAL:   ";
+    t.print_in_order();
+
+    cout << "TESTING REMOVING THE VALUE 15 FROM A TREE CONTAINING ONE 15" << endl;
+    cout << "EXPECTED RETURN VALUE: 0" << endl;
+    cout << "ACTUAL:                " << t.remove(15) << endl;
+    cout << "EXPECTED: 0 1 2 3 4 5 6 7 8 9 9 10 14" << endl;
+    cout << "ACTUAL:   ";
+    t.print_in_order();
+
+    cout << "TESTING REMOVING A VALUE THAT DOES NOT EXIST IN A TREE" << endl;
+    cout << "EXPECTED RETURN VALUE: 1" << endl;
+    cout << "ACTUAL:                " << t.remove(100) << endl;
+    cout << "EXPECTED: 0 1 2 3 4 5 6 7 8 9 9 10 14" << endl;
+    cout << "ACTUAL:   ";
+    t.print_in_order();
+
+    cout << "TESTING REMOVING 10 VALUES THAT EXIST IN A TREE" << endl;
+    cout << "EXPECTED RETURN VALUES: 0 0 0 0 0 0 0 0 0 0" << endl;
+    cout << "ACTUAL:                 ";
+    for(int i = 0; i < 10; i++) {
+        cout << t.remove(i) << " ";
+    }
+    cout << endl;
+    cout << "EXPECTED: 9 10 14" << endl;
+    cout << "ACTUAL:   ";
+    t.print_in_order();
+
+    t.remove(9);
+    t.remove(10);
+    cout << "TESTING REMOVING A VALUE FROM A TREE WITH A SINGLE NODE" << endl;
+    cout << "EXPECTED RETURN VALUE: 0" << endl;
+    cout << "ACTUAL:                " << t.remove(14) << endl;
+    cout << "EXPECTED: " << endl;
+    cout << "ACTUAL:   ";
+    t.print_in_order();
+
+    cout << "TESTING REMOVING A VALUE FROM AN EMPTY TREE" << endl;
+    cout << "EXPECTED RETURN VALUE: 1" << endl;
+    cout << "ACTUAL:                " << t.remove(1) << endl;
+    cout << "EXPECTED: " << endl;
+    cout << "ACTUAL:   ";
+    t.print_in_order();
+}
+
 int main() {
 
-    BST tree;
-    tree.add(4);
-    tree.add(5);
-    tree.add(2);
-    tree.add(3);
-    tree.add(8);
-    tree.add(6);
-    tree.add(5);
+    do_testing();
 
-    // Node* n1 = new Node(100);
-    // n1->left = new Node(99);
-    // n1->right = new Node(1500);
-
-    // tree.add(n1);
-
-    // BST tree2;
-    // tree2.add(nullptr);
-
-    tree.print_in_order();
-
-    tree.remove(8);
-
-    tree.print_in_order();
-
-    cout << "Ending program :)" << endl;
     return 0;
 }
