@@ -1,7 +1,3 @@
-TODO: 
-
-    still need to record frequency of collisions and their impact on complexity
-    
 This program implements a simple hash table class. It stores strings in an array of linked lists; the hash function
 chooses which index of the array to insert to by modding the string length by the array size. For example, if one were
 to insert the string "12345678" into a hash table of size 5, it would be put into index 3 because 8 % 5 = 3.
