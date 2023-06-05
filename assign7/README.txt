@@ -22,3 +22,9 @@ bool contains(string new_val) : O(n)
     This function returns whether or not a certain string is contained in the hash table. As with the implemented insert function, the worst-case
     scenario is that collisions have occurred in every insert. In this case, the run-time complexity is O(n) as the function must iterate through
     every single element.
+
+Line Numbers: 
+
+hash() : Line 82
+insert() : Line 88
+contains() : Line 103
