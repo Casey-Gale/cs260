@@ -7,6 +7,7 @@ using std::cout;
 using std::endl;
 using std::string;
 using std::vector;
+using std::set;
 
 class GraphNode;
 
@@ -43,6 +44,7 @@ class List {
     public:
         List();
         int get_length() const;
+        Node* get_head();
         void push(edge* val); //pushes to a sorted location in the list
         edge* pop_front();
 };
@@ -51,6 +53,7 @@ List::List() {
     this->length = 0;
 }
 int List::get_length() const {return this->length;}
+Node* List::get_head() {return this->head;}
 
 //automatically pushes a value to a sorted list in a sorted position
 void List::push(edge* new_val) {
@@ -203,30 +206,65 @@ string shortest_path(string source_name, string destination_name) {
 Graph* Graph::mst() {
     // create an ascending list of edges in the whole graph
     // implemented using auto-sorted list from assignment 5
+
+    // auto-sorted List of edges, sorted by ascending weight
     List edges;
     vector<set<GraphNode*>> subsets;
     for(GraphNode* node : this->nodes) {
         for(edge* e : node->get_neighbors()) {
             edges.push(e);
         }
-        subsets.insert(node);
+        set<GraphNode*> s;
+        s.insert(node);
+        subsets.push_back(s);
     }
     // create a vector of subsets containing a single node each ^^
 
     // iterate through all edges (lowest weights first) and attempt to union sets
     // if possible edge would create a cycle, remove it
 
-    for(edge* e : edges) {
-        for(auto subset : subsets) {
-            if(subset.count(e->source)) {
-                // if subset contains e->source, make note of subset (subset ptr maybe?)
+    Node* edge_current = edges.get_head();
+    while(edge_current != nullptr) {
+
+        set<GraphNode*>* source_set = nullptr;
+        set<GraphNode*>* destination_set = nullptr;
+        int source_index = 0;
+        int destination_index = 0;
+
+        // iterates through all current sets to find the sets containing edge_current source and destination
+        // for(auto subset : subsets) { // <- needed random access, so commented out
+        for(int i = 0; i < subsets.size(); i++) {
+            set<GraphNode*> subset = subsets.at(i);
+
+            if(subset.count(edge_current->val->source)) {
+                // if subset contains edge_current->val->source, make note of subset (subset ptr maybe?)
+                source_set = &subset;
+                source_index = i;
             }
-            if(subset.count(e->destination)) {
-                // if subset contains e->destination, make note of subset (subset ptr maybe?)
+            if(subset.count(edge_current->val->destination)) {
+                // if subset contains edge_current->val->destination, make note of subset (subset ptr maybe?)
+                destination_set = &subset;
+                destination_index = i;
             }
             
         }
-        // if e->source set == e->destination set, remove edge
+        
+        if(source_set == nullptr || destination_set == nullptr) {
+            cout << "SOMETHING BROKE : NEITHER OF THESE SHOULD BE NULLPTR" << endl;
+            cout << "source_set == " << source_set << " | destination_set == " << destination_set << endl;
+        }
+        // if edge_current->val->source set == edge_current->val->destination set, remove edge
+        else if(source_set == destination_set) {
+            // remove edge
+            edges.pop_front();
+        }
+        // now that source_set != destination_set AND neither == nullptr : 
+        // we attempt to merge both sets and then delete one
+        source_set->insert(destination_set->begin(), destination_set->end());
+        
+        subsets.erase(subsets.begin() + destination_index);
+
+        edge_current = edge_current->next;
     }
 
     return nullptr;
