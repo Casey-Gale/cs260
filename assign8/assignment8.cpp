@@ -149,6 +149,8 @@ class Graph {
         ~Graph();
         // get size of graph nodes list
         int get_size();
+        // get nodes array
+        vector<GraphNode*> get_nodes();
         // add node
         void add_node(string new_name);
         // add edge
@@ -156,7 +158,7 @@ class Graph {
         // shortest path, return string representing shortest paths from source to each destination node
         string shortest_path(string source_name);
         // minimum spanning tree
-        Graph* mst();
+        Graph* minimal_spanning_tree();
 };
 
 Graph::Graph() {
@@ -171,7 +173,11 @@ Graph::~Graph() {
 }
 
 int Graph::get_size() {
-    return nodes.size();
+    return this->nodes.size();
+}
+
+vector<GraphNode*> Graph::get_nodes() {
+    return this->nodes;
 }
 
 void Graph::add_node(string new_name) {
@@ -203,14 +209,16 @@ string shortest_path(string source_name, string destination_name) {
     return ":)";
 }
 
-Graph* Graph::mst() {
+Graph* Graph::minimal_spanning_tree() {
     // create an ascending list of edges in the whole graph
     // implemented using auto-sorted list from assignment 5
-
+    Graph* mst = new Graph;
     // auto-sorted List of edges, sorted by ascending weight
     List edges;
+    List confirmed_edges;
     vector<set<GraphNode*>> subsets;
     for(GraphNode* node : this->nodes) {
+        mst->add_node(node->get_val());
         for(edge* e : node->get_neighbors()) {
             edges.push(e);
         }
@@ -223,7 +231,9 @@ Graph* Graph::mst() {
     // iterate through all edges (lowest weights first) and attempt to union sets
     // if possible edge would create a cycle, remove it
 
+
     Node* edge_current = edges.get_head();
+    // iterates m times, where m is number of edges in graph
     while(edge_current != nullptr) {
 
         set<GraphNode*>* source_set = nullptr;
@@ -260,31 +270,66 @@ Graph* Graph::mst() {
         }
         // now that source_set != destination_set AND neither == nullptr : 
         // we attempt to merge both sets and then delete one
-        source_set->insert(destination_set->begin(), destination_set->end());
-        
-        subsets.erase(subsets.begin() + destination_index);
-
+        else {
+            confirmed_edges.push(edges.pop_front());
+            source_set->insert(destination_set->begin(), destination_set->end());
+            
+            subsets.erase(subsets.begin() + destination_index);
+        }
         edge_current = edge_current->next;
     }
 
-    return nullptr;
+    while(confirmed_edges.get_length() > 0) {
+        edge* e = confirmed_edges.pop_front();
+        mst->add_edge(e->source->get_val(), e->destination->get_val(), e->weight);
+    }
+
+    return mst;
 }
 
 
 int main() {
-    // create an edge to test :)
-    edge *new_edge = new edge{nullptr, nullptr, 42};
-    cout << "new_edge->source: " << new_edge->source << endl << "new_edge->destination: " << new_edge->destination << endl << "new_edge->weight: " << new_edge->weight << endl << endl;
+    // // create an edge to test :)
+    // edge *new_edge = new edge{nullptr, nullptr, 42};
+    // cout << "new_edge->source: " << new_edge->source << endl << "new_edge->destination: " << new_edge->destination << endl << "new_edge->weight: " << new_edge->weight << endl << endl;
 
-    // create a simple node to test :)
-    GraphNode* new_node = new GraphNode("Corvallis"); // default constructor
-    cout << "new_node->get_val(): " << new_node->get_val() << endl << "new_node->get_neighbors().size(): " << new_node->get_neighbors().size() << endl << endl;
+    // // create a simple node to test :)
+    // GraphNode* new_node = new GraphNode("Corvallis"); // default constructor
+    // cout << "new_node->get_val(): " << new_node->get_val() << endl << "new_node->get_neighbors().size(): " << new_node->get_neighbors().size() << endl << endl;
 
-    // add edge to node :)
-    new_node->add_edge(new_node, 1);
-    cout << "new_node->get_val(): " << new_node->get_val() << endl << "new_node->get_neighbors().at(0)->destination->get_val(): " << new_node->get_neighbors().at(0)->destination->get_val() << endl << endl;
-
+    // // add edge to node :)
+    // new_node->add_edge(new_node, 1);
+    // cout << "new_node->get_val(): " << new_node->get_val() << endl << "new_node->get_neighbors().at(0)->destination->get_val(): " << new_node->get_neighbors().at(0)->destination->get_val() << endl << endl;
+    
     // create graph
+    Graph g;
+    g.add_node("A");
+    g.add_node("B");
+    g.add_node("C");
+    g.add_node("D");
+    g.add_node("E");
+    g.add_node("F");
+
+    g.add_edge("A", "B", 1);
+    g.add_edge("A", "D", 5);
+    g.add_edge("B", "D", 10);
+    g.add_edge("B", "C", 11);
+    g.add_edge("C", "E", 3);
+    g.add_edge("C", "F", 5);
+    g.add_edge("D", "E", 7);
+    g.add_edge("E", "F", 9);
+
+    Graph* min_g = g.minimal_spanning_tree();
+
+    // testing on minimal spanning tree of g !
+    // see design for layout of g
+    for(int i = 0; i < min_g->get_size(); i++) {
+        cout << "Neighbors of Node " << min_g->get_nodes()[i]->get_val() << ": " << endl;
+        for(auto neighbor : min_g->get_nodes()[i]->get_neighbors()) {
+            cout << "  " << neighbor->destination->get_val() << " (Weight " << neighbor->weight << ")" << endl;
+        }
+        cout << endl;
+    }
 
     return 0;
 }
