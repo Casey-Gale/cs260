@@ -161,7 +161,7 @@ class Graph {
         // add edge
         void add_edge(string source_name, string destination_name, int weight);
         // shortest path, return string representing shortest paths from source to each destination node
-        string shortest_path(string source_name);
+        string shortest_path(string source_name, string destination_name);
         // minimum spanning tree
         Graph* minimal_spanning_tree();
 };
@@ -201,8 +201,33 @@ void Graph::add_edge(string source_name, string destination_name, int weight) {
 
 }
 
-string shortest_path(string source_name, string destination_name) {
-    return ":)";
+struct sp_table {
+    int cost;
+    string predecessor;
+};
+
+// assumes graph does not contain negative weight edges
+string Graph::shortest_path(string source_name, string destination_name) {
+    // make a string at the beginning of the function, then append path at the end
+    string path = "";
+
+    // algorithm: assume minimum weight to get to source node is 0, weight to get to all other nodes is infinity (-1 because this is unreachable without negative weights)
+    // procedurally check lowest weighted edges to see if it would result in a lower weight path
+
+    // we need to keep track of 3 things per node: path cost, has visited, shortest predecessor
+    
+    vector<sp_table*> table;
+    for(GraphNode* node : this->nodes) {
+        int c = -1;
+        if(node->get_val() == source_name) {
+            c = 0;
+        }
+        sp_table* entry = new sp_table {cost = c; predecessor = "";};
+        table.push_back(entry);
+    }
+
+
+    return path;
 }
 
 Graph* Graph::minimal_spanning_tree() {
@@ -242,28 +267,28 @@ Graph* Graph::minimal_spanning_tree() {
         for(int i = 0; i < subsets.size(); i++) {
 
             set<GraphNode*>& subset = subsets.at(i);
-            cout << "subsets[" << i << "]: " << &subsets.at(i) << endl;
+            // cout << "subsets[" << i << "]: " << &subsets.at(i) << endl;
 
             if(subset.count(edge_current->val->source)) {
                 // if subset contains edge_current->val->source, make note of subset (subset ptr maybe?)
                 source_set = subset;
-                cout << " address of source_set: " << &source_set << endl;
+                // cout << " address of source_set: " << &source_set << endl;
                 source_index = i;
             }
             else {
-                cout << " source_set does not contain " << edge_current->val->source->get_val() << endl;
+                // cout << " source_set does not contain " << edge_current->val->source->get_val() << endl;
             }
             if(subset.count(edge_current->val->destination)) {
                 // if subset contains edge_current->val->destination, make note of subset (subset ptr maybe?)
                 destination_set = subset;
-                cout << " address of destination_set: " << &destination_set << endl;
+                // cout << " address of destination_set: " << &destination_set << endl;
                 destination_index = i;
             }
             else {
-                cout << " destination_set does not contain " << edge_current->val->destination->get_val() << endl;
+                // cout << " destination_set does not contain " << edge_current->val->destination->get_val() << endl;
             }
 
-            cout << "source_index: " << source_index << " destination_index: " << destination_index << endl;
+            // cout << "source_index: " << source_index << " destination_index: " << destination_index << endl;
             if(source_index != -1 && destination_index != -1) {
                 break;
             }
@@ -277,15 +302,15 @@ Graph* Graph::minimal_spanning_tree() {
 
         // if edge_current->val->source set == edge_current->val->destination set, remove edge
         edge* e = edges.pop_front();
-        e->print();
+        // e->print();
         if(source_set == destination_set) {
             // remove edge
-            cout << "Edge would create a cycle" << endl << endl;
+            // cout << "Edge would create a cycle" << endl << endl;
         }
         // now that source_set != destination_set AND neither == nullptr : 
         // we attempt to merge both sets and then delete one
         else {
-            cout << "Adding edge to mst" << endl;
+            // cout << "Adding edge to mst" << endl;
             confirmed_edges.push(e);
             source_set.insert(destination_set.begin(), destination_set.end());
             if(source_index > destination_index) {
@@ -300,21 +325,21 @@ Graph* Graph::minimal_spanning_tree() {
             subsets.push_back(source_set);
 
 
-            cout << "Whew! Through the scary clause" << endl << endl;
+            // cout << "Whew! Through the scary clause" << endl << endl;
         }
         edge_current = edge_current->next;
     }
 
-    cout << "confirmed_edges.get_length() == " << confirmed_edges.get_length() << endl;
+    // cout << "confirmed_edges.get_length() == " << confirmed_edges.get_length() << endl;
     int n = confirmed_edges.get_length();
     while(n > 0) {
         edge* e = confirmed_edges.pop_front();
-        e->print();
+        // e->print();
         mst->add_edge(e->source->get_val(), e->destination->get_val(), e->weight);
-        cout << "check" << endl;
+        // cout << "check" << endl;
         n--;
     }
-    cout << "zoo wee mama" << endl;
+    // cout << "zoo wee mama" << endl;
 
     return mst;
 }
