@@ -15,6 +15,7 @@ struct edge {
     GraphNode* source;
     GraphNode* destination;
     int weight;
+    void print();
 };
 
 // auto sorted list from assignment 5!
@@ -120,6 +121,8 @@ class GraphNode {
         vector<edge*> get_neighbors();
 };
 
+void edge::print() {cout << "Edge between " << this->source->get_val() << " and " << this->destination->get_val() << " (Weight " << this->weight << ")" << endl;}
+
 GraphNode::GraphNode() {
     this->val = "";
 }
@@ -151,6 +154,8 @@ class Graph {
         int get_size();
         // get nodes array
         vector<GraphNode*> get_nodes();
+        // print all neighbors of all nodes
+        void print_neighbors();
         // add node
         void add_node(string new_name);
         // add edge
@@ -164,21 +169,12 @@ class Graph {
 Graph::Graph() {
     // do nothing i guess
 }
-Graph::Graph(GraphNode* new_node) {
-    this->nodes.push_back(new_node);
-}
-
+Graph::Graph(GraphNode* new_node) {this->nodes.push_back(new_node);}
 Graph::~Graph() {
-
+    // nothing so far
 }
-
-int Graph::get_size() {
-    return this->nodes.size();
-}
-
-vector<GraphNode*> Graph::get_nodes() {
-    return this->nodes;
-}
+int Graph::get_size() {return this->nodes.size();}
+vector<GraphNode*> Graph::get_nodes() {return this->nodes;}
 
 void Graph::add_node(string new_name) {
     GraphNode* new_node = new GraphNode(new_name);
@@ -236,71 +232,106 @@ Graph* Graph::minimal_spanning_tree() {
     // iterates m times, where m is number of edges in graph
     while(edge_current != nullptr) {
 
-        set<GraphNode*>* source_set = nullptr;
-        set<GraphNode*>* destination_set = nullptr;
-        int source_index = 0;
-        int destination_index = 0;
+        set<GraphNode*> source_set;
+        set<GraphNode*> destination_set;
+        int source_index = -1;
+        int destination_index = -1;
 
         // iterates through all current sets to find the sets containing edge_current source and destination
         // for(auto subset : subsets) { // <- needed random access, so commented out
         for(int i = 0; i < subsets.size(); i++) {
-            set<GraphNode*> subset = subsets.at(i);
+
+            set<GraphNode*>& subset = subsets.at(i);
+            cout << "subsets[" << i << "]: " << &subsets.at(i) << endl;
 
             if(subset.count(edge_current->val->source)) {
                 // if subset contains edge_current->val->source, make note of subset (subset ptr maybe?)
-                source_set = &subset;
+                source_set = subset;
+                cout << " address of source_set: " << &source_set << endl;
                 source_index = i;
+            }
+            else {
+                cout << " source_set does not contain " << edge_current->val->source->get_val() << endl;
             }
             if(subset.count(edge_current->val->destination)) {
                 // if subset contains edge_current->val->destination, make note of subset (subset ptr maybe?)
-                destination_set = &subset;
+                destination_set = subset;
+                cout << " address of destination_set: " << &destination_set << endl;
                 destination_index = i;
+            }
+            else {
+                cout << " destination_set does not contain " << edge_current->val->destination->get_val() << endl;
+            }
+
+            cout << "source_index: " << source_index << " destination_index: " << destination_index << endl;
+            if(source_index != -1 && destination_index != -1) {
+                break;
             }
             
         }
-        
-        if(source_set == nullptr || destination_set == nullptr) {
-            cout << "SOMETHING BROKE : NEITHER OF THESE SHOULD BE NULLPTR" << endl;
-            cout << "source_set == " << source_set << " | destination_set == " << destination_set << endl;
-        }
+        // vvvv I DONT KNOW HOW TO CHECK THIS WHEN THEYRE NOT POINTERS vvvv
+        // if(source_set == nullptr || destination_set == nullptr) {
+        //     cout << "SOMETHING BROKE : NEITHER OF THESE SHOULD BE NULLPTR" << endl;
+        //     cout << "source_set == " << source_set << " | destination_set == " << destination_set << endl;
+        // }
+
         // if edge_current->val->source set == edge_current->val->destination set, remove edge
-        else if(source_set == destination_set) {
+        edge* e = edges.pop_front();
+        e->print();
+        if(source_set == destination_set) {
             // remove edge
-            edges.pop_front();
+            cout << "Edge would create a cycle" << endl << endl;
         }
         // now that source_set != destination_set AND neither == nullptr : 
         // we attempt to merge both sets and then delete one
         else {
-            confirmed_edges.push(edges.pop_front());
-            source_set->insert(destination_set->begin(), destination_set->end());
-            
-            subsets.erase(subsets.begin() + destination_index);
+            cout << "Adding edge to mst" << endl;
+            confirmed_edges.push(e);
+            source_set.insert(destination_set.begin(), destination_set.end());
+            if(source_index > destination_index) {
+                subsets.erase(subsets.begin() + source_index);
+                subsets.erase(subsets.begin() + destination_index);
+            }
+            else {
+                subsets.erase(subsets.begin() + destination_index);
+                subsets.erase(subsets.begin() + source_index);
+            }
+
+            subsets.push_back(source_set);
+
+
+            cout << "Whew! Through the scary clause" << endl << endl;
         }
         edge_current = edge_current->next;
     }
 
-    while(confirmed_edges.get_length() > 0) {
+    cout << "confirmed_edges.get_length() == " << confirmed_edges.get_length() << endl;
+    int n = confirmed_edges.get_length();
+    while(n > 0) {
         edge* e = confirmed_edges.pop_front();
+        e->print();
         mst->add_edge(e->source->get_val(), e->destination->get_val(), e->weight);
+        cout << "check" << endl;
+        n--;
     }
+    cout << "zoo wee mama" << endl;
 
     return mst;
 }
 
+void Graph::print_neighbors() {
+    for(int i = 0; i < this->get_size(); i++) {
+        cout << "Neighbors of Node " << this->get_nodes()[i]->get_val() << ": " << endl;
+        for(auto neighbor : this->get_nodes()[i]->get_neighbors()) {
+            cout << "  " << neighbor->destination->get_val() << " (Weight " << neighbor->weight << ")" << endl;
+        }
+        cout << endl;
+    }
+} 
+
 
 int main() {
-    // // create an edge to test :)
-    // edge *new_edge = new edge{nullptr, nullptr, 42};
-    // cout << "new_edge->source: " << new_edge->source << endl << "new_edge->destination: " << new_edge->destination << endl << "new_edge->weight: " << new_edge->weight << endl << endl;
 
-    // // create a simple node to test :)
-    // GraphNode* new_node = new GraphNode("Corvallis"); // default constructor
-    // cout << "new_node->get_val(): " << new_node->get_val() << endl << "new_node->get_neighbors().size(): " << new_node->get_neighbors().size() << endl << endl;
-
-    // // add edge to node :)
-    // new_node->add_edge(new_node, 1);
-    // cout << "new_node->get_val(): " << new_node->get_val() << endl << "new_node->get_neighbors().at(0)->destination->get_val(): " << new_node->get_neighbors().at(0)->destination->get_val() << endl << endl;
-    
     // create graph
     Graph g;
     g.add_node("A");
@@ -321,15 +352,8 @@ int main() {
 
     Graph* min_g = g.minimal_spanning_tree();
 
-    // testing on minimal spanning tree of g !
-    // see design for layout of g
-    for(int i = 0; i < min_g->get_size(); i++) {
-        cout << "Neighbors of Node " << min_g->get_nodes()[i]->get_val() << ": " << endl;
-        for(auto neighbor : min_g->get_nodes()[i]->get_neighbors()) {
-            cout << "  " << neighbor->destination->get_val() << " (Weight " << neighbor->weight << ")" << endl;
-        }
-        cout << endl;
-    }
+    g.print_neighbors();
+    min_g->print_neighbors();
 
     return 0;
 }
