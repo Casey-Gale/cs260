@@ -202,7 +202,9 @@ void Graph::add_edge(string source_name, string destination_name, int weight) {
 }
 
 struct sp_table {
+    GraphNode* node;
     int cost;
+    bool has_visited;
     string predecessor;
 };
 
@@ -214,7 +216,7 @@ string Graph::shortest_path(string source_name, string destination_name) {
     // algorithm: assume minimum weight to get to source node is 0, weight to get to all other nodes is infinity (-1 because this is unreachable without negative weights)
     // procedurally check lowest weighted edges to see if it would result in a lower weight path
 
-    // we need to keep track of 3 things per node: path cost, has visited, shortest predecessor
+    // we need to keep track of 4 things per node: node, path cost, has visited, shortest predecessor
     
     vector<sp_table*> table;
     for(GraphNode* node : this->nodes) {
@@ -222,10 +224,22 @@ string Graph::shortest_path(string source_name, string destination_name) {
         if(node->get_val() == source_name) {
             c = 0;
         }
-        sp_table* entry = new sp_table {cost = c; predecessor = "";};
+        sp_table* entry = new sp_table;
+        entry->node = node;
+        entry->cost = c;
+        entry->predecessor = "";
         table.push_back(entry);
     }
 
+    // loop through every entry in the table. at each node, loop through every neighbor. at each neighbor of each node, 
+    // calculate weight of path. place this in the proper cost entry, along with the direct predecessor
+
+    for(sp_table* col : table) {
+        for(edge* neighbor : col->node->get_neighbors()) {
+            // code that will run for every neighbor of every node
+            
+        }
+    }
 
     return path;
 }
@@ -375,10 +389,10 @@ int main() {
     g.add_edge("D", "E", 7);
     g.add_edge("E", "F", 9);
 
-    Graph* min_g = g.minimal_spanning_tree();
+    // Graph* min_g = g.minimal_spanning_tree();
 
-    g.print_neighbors();
-    min_g->print_neighbors();
+    // g.print_neighbors();
+    // min_g->print_neighbors();
 
     return 0;
 }
