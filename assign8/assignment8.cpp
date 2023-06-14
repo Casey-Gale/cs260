@@ -212,6 +212,7 @@ struct sp_table {
 string Graph::shortest_path(string source_name, string destination_name) {
     // make a string at the beginning of the function, then append path at the end
     string path = "";
+    
 
     // algorithm: assume minimum weight to get to source node is 0, weight to get to all other nodes is infinity (-1 because this is unreachable without negative weights)
     // procedurally check lowest weighted edges to see if it would result in a lower weight path
@@ -237,7 +238,7 @@ string Graph::shortest_path(string source_name, string destination_name) {
     for(sp_table* col : table) {
         for(edge* neighbor : col->node->get_neighbors()) {
             // code that will run for every neighbor of every node
-            
+
         }
     }
 
