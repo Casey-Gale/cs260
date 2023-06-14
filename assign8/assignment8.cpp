@@ -222,7 +222,7 @@ string Graph::shortest_path(string source_name, string destination_name) {
     // table containing all nodes in the graph, along with information about cost, whether or not the node has been visited, and its cheapest predecessor
     vector<sp_table*> table;
 
-
+    // O(n)
     for(GraphNode* node : this->nodes) {
         int c = -1;
         if(node->get_val() == source_name) {
@@ -240,9 +240,8 @@ string Graph::shortest_path(string source_name, string destination_name) {
     // places the source node in the adjacent nodes set by itself. in future iterations edge->destinations will be inserted to this set
     bool s = false;
     bool d = false;
+    // O(n)
     for(auto row : table) {
-        // cout << "row->node->get_val(): " << row->node->get_val() << endl;
-        // cout << "destination_name:     " << destination_name << endl;
         if(row->node->get_val() == destination_name) {
             final_destination_row = row;
             d = true;
@@ -262,15 +261,15 @@ string Graph::shortest_path(string source_name, string destination_name) {
     // loop through every entry in the table. at each node, loop through every neighbor. at each neighbor of each node, 
     // calculate weight of path. place this in the proper cost entry, along with the direct predecessor
     bool is_finished = false;
+    // O(n^3*e)
     while(!is_finished) {
         is_finished = true;
-        // cout << "troll " << endl;
+        // O(n^2*e)
         for(sp_table* row : table) {
-            // cout << " viewing new row (" << row->node->get_val() << ")" << endl;
             // only looks at neighbors if node is contained in adjacent nodes
             if(adjacent_nodes.count(row->node)) {
-                // cout << "  viewing adjacent node (" << row->node->get_val() << ")" << endl;
                 adjacent_nodes.erase(row->node);
+                // O(n*e)
                 for(edge* neighbor : row->node->get_neighbors()) {
                     // code that will run for every neighbor of every node
                     if(row->has_visited) {
@@ -278,45 +277,22 @@ string Graph::shortest_path(string source_name, string destination_name) {
                     }
                     adjacent_nodes.insert(neighbor->destination);
                     sp_table* destination_row = nullptr;
-                    // BELOW IS BAD! IT SHOULD NOT WORK! BAD COMPLEXITY!!
-                    // it finds the destination of a given edge
+                    // this finds the destination of a given edge
+                    // O(n)
                     for(int i = 0; i < table.size(); i++) {
-                        // cout << "table.at(" << i << "): " << table.at(i)->node->get_val() << endl;
-                        // cout << "neighbor:   " << neighbor->destination->get_val() << endl;
                         if(table.at(i)->node->get_val() == neighbor->destination->get_val()) {
                             destination_row = table.at(i);
                             break;
                         }
                     }
                     if(destination_row->has_visited) {
-                        // cout << "node has been visited before" << endl;
                     }
                     // the meat of the algorithm. changes to the lower cost and sets cheapest predecessor
                     else {
-                        // debug statement skips edges to already visited nodes
-                        // cout << "   regarding (" << row->node->get_val() << ")" << ", (" << destination_row->node->get_val() << "): " << endl;
-                        // cout << "    before destination_row->cost: " << destination_row->cost << endl;
-                        // cout << "    before row->cost + neighbor->weight: " << row->cost + neighbor->weight << endl;
-                        // cout << "    before destination_row->cost: " << destination_row->cost << endl;
-                        // if(destination_row->predecessor != nullptr) {
-                        //     cout << "    before destination_row->predecessor: " << destination_row->predecessor->node->get_val() << endl;
-                        // }
-                        // else {
-                        //     cout << "    before destination_row->predecessor: " << destination_row->predecessor << endl;
-                        // }
                         if(destination_row->cost > row->cost + neighbor->weight || destination_row->cost == -1) {
                             destination_row->cost = row->cost + neighbor->weight;
                             destination_row->predecessor = row;
                         }   
-                        // cout << "    after destination_row->cost: " << destination_row->cost << endl;
-                        // cout << "    after row->cost + neighbor->weight: " << row->cost + neighbor->weight << endl;
-                        // cout << "    after destination_row->cost: " << destination_row->cost << endl;
-                        // if(destination_row->predecessor != nullptr) {
-                        //     cout << "    after destination_row->predecessor: " << destination_row->predecessor->node->get_val() << endl;
-                        // }
-                        // else {
-                        //     cout << "    after destination_row->predecessor: " << destination_row->predecessor << endl;
-                        // }
                     }
                 }
                 row->has_visited = true;
@@ -336,32 +312,13 @@ string Graph::shortest_path(string source_name, string destination_name) {
         }
     }
 
-    // cout << "finished with the logic!" << endl;
-
-    //prints out the full table
-    // for(auto row : table) {
-    //     cout << row->node->get_val() << " | " << row->cost << " | " << row->has_visited << " | ";
-    //     if(row->predecessor != nullptr) {
-    //         cout << row->predecessor->node->get_val() << endl;
-    //     }
-    //     else {
-    //         cout << row->predecessor << endl;
-    //     }
-    // }
-
     sp_table* current = final_destination_row;
 
-    // cout << "address of final_destination_row: " << final_destination_row << endl;
     path = final_destination_row->node->get_val();
-    // cout << path << endl;
     while(current->predecessor != nullptr) {
         current = current->predecessor;
         path = current->node->get_val() + "->" + path;
-        // cout << path << endl;
     }
-    // path = final_destination_row->node->get_val() + "->" + path;
-
-    // cout << path << endl;
 
     return path;
 }
@@ -374,8 +331,10 @@ Graph* Graph::minimal_spanning_tree() {
     List edges;
     List confirmed_edges;
     vector<set<GraphNode*>> subsets;
+    // O(n^2)
     for(GraphNode* node : this->nodes) {
         mst->add_node(node->get_val());
+        // O(n)
         for(edge* e : node->get_neighbors()) {
             edges.push(e);
         }
@@ -388,9 +347,9 @@ Graph* Graph::minimal_spanning_tree() {
     // iterate through all edges (lowest weights first) and attempt to union sets
     // if possible edge would create a cycle, remove it
 
-
     Node* edge_current = edges.get_head();
     // iterates m times, where m is number of edges in graph
+    // O(n^2)
     while(edge_current != nullptr) {
 
         set<GraphNode*> source_set;
@@ -399,54 +358,34 @@ Graph* Graph::minimal_spanning_tree() {
         int destination_index = -1;
 
         // iterates through all current sets to find the sets containing edge_current source and destination
-        // for(auto subset : subsets) { // <- needed random access, so commented out
+        // O(n)
         for(int i = 0; i < subsets.size(); i++) {
 
             set<GraphNode*>& subset = subsets.at(i);
-            // cout << "subsets[" << i << "]: " << &subsets.at(i) << endl;
 
             if(subset.count(edge_current->val->source)) {
                 // if subset contains edge_current->val->source, make note of subset (subset ptr maybe?)
                 source_set = subset;
-                // cout << " address of source_set: " << &source_set << endl;
                 source_index = i;
-            }
-            else {
-                // cout << " source_set does not contain " << edge_current->val->source->get_val() << endl;
             }
             if(subset.count(edge_current->val->destination)) {
                 // if subset contains edge_current->val->destination, make note of subset (subset ptr maybe?)
                 destination_set = subset;
-                // cout << " address of destination_set: " << &destination_set << endl;
                 destination_index = i;
             }
-            else {
-                // cout << " destination_set does not contain " << edge_current->val->destination->get_val() << endl;
-            }
-
-            // cout << "source_index: " << source_index << " destination_index: " << destination_index << endl;
             if(source_index != -1 && destination_index != -1) {
                 break;
             }
-            
         }
-        // vvvv I DONT KNOW HOW TO CHECK THIS WHEN THEYRE NOT POINTERS vvvv
-        // if(source_set == nullptr || destination_set == nullptr) {
-        //     cout << "SOMETHING BROKE : NEITHER OF THESE SHOULD BE NULLPTR" << endl;
-        //     cout << "source_set == " << source_set << " | destination_set == " << destination_set << endl;
-        // }
 
         // if edge_current->val->source set == edge_current->val->destination set, remove edge
         edge* e = edges.pop_front();
-        // e->print();
         if(source_set == destination_set) {
             // remove edge
-            // cout << "Edge would create a cycle" << endl << endl;
         }
         // now that source_set != destination_set AND neither == nullptr : 
         // we attempt to merge both sets and then delete one
         else {
-            // cout << "Adding edge to mst" << endl;
             confirmed_edges.push(e);
             source_set.insert(destination_set.begin(), destination_set.end());
             if(source_index > destination_index) {
@@ -457,26 +396,17 @@ Graph* Graph::minimal_spanning_tree() {
                 subsets.erase(subsets.begin() + destination_index);
                 subsets.erase(subsets.begin() + source_index);
             }
-
             subsets.push_back(source_set);
-
-
-            // cout << "Whew! Through the scary clause" << endl << endl;
         }
         edge_current = edge_current->next;
     }
-
-    // cout << "confirmed_edges.get_length() == " << confirmed_edges.get_length() << endl;
     int n = confirmed_edges.get_length();
+    // O(n)
     while(n > 0) {
         edge* e = confirmed_edges.pop_front();
-        // e->print();
         mst->add_edge(e->source->get_val(), e->destination->get_val(), e->weight);
-        // cout << "check" << endl;
         n--;
     }
-    // cout << "zoo wee mama" << endl;
-
     return mst;
 }
 
@@ -564,7 +494,6 @@ void do_testing() {
     cout << "Neighbors of Node E: " << endl << "  C (3)" << endl << "  D (7)" << endl;
     cout << "Neighbors of Node F: " << endl << "  C (5)" << endl << endl;
     min_g1 = g1.minimal_spanning_tree();
-    g1.print_neighbors();
     min_g1->print_neighbors();
 
     cout << "Testing functions on graph 2." << endl;
@@ -592,50 +521,33 @@ void do_testing() {
     cout << "Neighbors of Node H: " << endl << "  G (100)" << endl << endl;
     cout << "ACTUAL: " << endl;
     min_g2 = g2.minimal_spanning_tree();
-    g2.print_neighbors();
     min_g2->print_neighbors();
 
-    
+    cout << "Testing functions on graph 3." << endl;
+    cout << "Between nodes A and C: " << endl;
+    cout << "EXPECTED: A->D->B->C" << endl;
+    cout << "ACTUAL:   " << g3.shortest_path("A", "C") << endl;
+    cout << "Between nodes D and C: " << endl;
+    cout << "EXPECTED: D->B->C" << endl;
+    cout << "ACTUAL:   " << g3.shortest_path("D", "C") << endl;
+    cout << "Between nodes B and E (E not contained in Graph)" << endl;
+    cout << "EXPECTED: No path can be found!" << endl;
+    cout << "ACTUAL:   " << g3.shortest_path("B", "E") << endl;
 
+    cout << "Minimum Spanning Tree..." << endl;
+    cout << "EXPECTED: " << endl;
+    cout << "Neighbors of Node A: " << endl << "  D (1)" << endl;
+    cout << "Neighbors of Node B: " << endl << "  C (2)" << endl << "  D (1)" << endl;
+    cout << "Neighbors of Node C: " << endl << "  B (2)" << endl;
+    cout << "Neighbors of Node D: " << endl << "  A (1)" << endl << "  B (1)" << endl;
+    cout << "ACTUAL: " << endl;
+    min_g3 = g3.minimal_spanning_tree();
+    min_g3->print_neighbors();
 }
 
 int main() {
 
     do_testing();
-
-    // // create graph
-    // Graph g1;
-    // g1.add_node("A");
-    // g1.add_node("B");
-    // g1.add_node("C");
-    // g1.add_node("D");
-    // g1.add_node("E");
-    // g1.add_node("F");
-    // // g1.add_node("G");
-    // // g1.add_node("H");
-
-    // g1.add_edge("A", "B", 1);
-    // g1.add_edge("A", "D", 5);
-    // g1.add_edge("B", "D", 10);
-    // g1.add_edge("B", "C", 11);
-    // g1.add_edge("C", "E", 3);
-    // g1.add_edge("C", "F", 5);
-    // g1.add_edge("D", "E", 7);
-    // g1.add_edge("E", "F", 9);
-
-    // // g1.add_edge("G", "H", 1);
-
-    // Graph* min_g1 = g1.minimal_spanning_tree();
-
-    // g1.print_neighbors();
-    // min_g1->print_neighbors();
-
-    // cout << "Shortest path between A and B: " << endl;
-    // cout << "Expected: A->B" << endl;
-    // cout << "Actual:   " << endl;
-    
-    // cout << g.shortest_path("G", "H") << endl;
-    // g.shortest_path("B", "E");
 
     return 0;
 }
